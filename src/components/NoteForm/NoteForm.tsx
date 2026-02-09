@@ -2,6 +2,10 @@ import css from "./NoteForm.module.css";
 import { useId } from "react";
 import { Formik, Form, Field, ErrorMessage, type FormikHelpers } from "formik";
 import * as Yup from "yup";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createNote } from "../../services/noteService";
+import toast, { Toaster } from 'react-hot-toast';
+
 
 type Tag = "Todo" | "Work" | "Personal" | "Meeting" | "Shopping";
 
@@ -27,22 +31,43 @@ const initialValues: NoteFormValues = {
             content: "",
             tag: "Todo",
         };
+interface NoteFormProps {
+  onClose: () => void;
+}       
 
-export default function NoteForm() {
+export default function NoteForm({onClose}: NoteFormProps) {
+  const queryClient = useQueryClient();
+
+  const {mutate, isPending} = useMutation({
+    mutationFn: createNote,
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ["notes"]});
+      onClose()
+    },
+    onError() {
+      toast.error("There is an error.")
+    },
+  })
+
    
 
-      const fieldId = useId();
+const fieldId = useId();
 
 const handleSubmit = (
     values: NoteFormValues, 
     actions: FormikHelpers<NoteFormValues>
 ) => {
-    console.log(values);
-    actions.resetForm();
-}
+mutate(values, {
+  onSuccess: () => {
+actions.resetForm();
+  },
+});
+};
+  
 
         return (
         <div>
+          <div><Toaster/></div>
         <Formik 
         initialValues={initialValues} 
         onSubmit={handleSubmit} 
@@ -83,12 +108,14 @@ const handleSubmit = (
 
   <div className={css.actions}>
     <button type="button" 
-    className={css.cancelButton}>
+    className={css.cancelButton}
+    onClick={onClose}>
       Cancel
     </button>
     <button
       type="submit"
       className={css.submitButton}
+      disabled={isPending}
     >
       Create note
     </button>
