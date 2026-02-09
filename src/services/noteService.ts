@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import type { Note, NoteId } from "../types/note";
+import type { Note } from "../types/note";
 
 axios.defaults.baseURL = "https://notehub-public.goit.study/api/";
 
@@ -25,7 +25,7 @@ export const fetchNotes = async ({ search, page, perPage }: fetchNotesProps ) =>
       params,
       headers: {
         accept: 'application/json',
-        Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
+        Authorization: `Bearer ${import.meta.env.VITE_NOTEHUB_TOKEN}`,
       },
     }
   );
@@ -39,19 +39,19 @@ export const createNote = async (noteData: Pick<Note, "title" | "content" | "tag
     {
       headers: {
         accept: 'application/json',
-        Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
+        Authorization: `Bearer ${import.meta.env.VITE_NOTEHUB_TOKEN}`,
       },
     }
   );
   return data;
 };
 
-export const deleteNote = async (id: NoteId) => {
+export const deleteNote = async (id: number) => {
 const { data } = await axios.delete<Note>(`/notes/${id}`,
      {
       headers: {
         accept: 'application/json',
-        Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
+        Authorization: `Bearer ${import.meta.env.VITE_NOTEHUB_TOKEN}`,
       },
     }
 );

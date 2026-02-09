@@ -16,15 +16,21 @@ import Modal from "../Modal/Modal";
 
 
 export default function App() {
-  const [search, setQuery] = useState('');
+  const [query, setQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
  const [perPage] = useState(12);
- const debouncedSetQuery = useDebouncedCallback(setQuery, 300);
+ const debouncedSetQuery = useDebouncedCallback(
+  (value: string) => {
+setQuery(value);
+setCurrentPage(1);
+    },
+    300,
+);
 
   const {data, isLoading, isError, isSuccess} =  useQuery({
-    queryKey: ["notes", search, currentPage, perPage],
+    queryKey: ["notes", query, currentPage, perPage],
     queryFn: () => fetchNotes(
-      {search, page: currentPage, perPage}),
+      {search: query, page: currentPage, perPage}),
   });
  
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,7 +41,7 @@ export default function App() {
      <>
   <div className={css.app}>
 	<header className={css.toolbar}>
-		<SearchBox text={search} onSearch={debouncedSetQuery}/>
+		<SearchBox text={query} onSearch={debouncedSetQuery}/>
     {isSuccess && (
     <Pagination page={currentPage} totalPages={data.totalPages} onPageChange={setCurrentPage}/>
     )}
