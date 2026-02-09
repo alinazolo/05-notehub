@@ -1,14 +1,13 @@
 import css from "./App.module.css"
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SearchBox from "../SearchBox/SearchBox";
 import {fetchNotes} from "../../services/noteService";
-import toast, { Toaster } from 'react-hot-toast';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import ReactPaginate from 'react-paginate';
-import type { Note } from "../../types/note";
+import { useQuery } from '@tanstack/react-query';
 import NoteForm from "../NoteForm/NoteForm";
 import Pagination from "../Pagination/Pagination";
 import { useDebouncedCallback } from "use-debounce";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import Loader from "../Loader/Loader";
 
 
 import NoteList from "../NoteList/NoteList";
@@ -22,16 +21,11 @@ export default function App() {
  const [perPage] = useState(12);
  const debouncedSetQuery = useDebouncedCallback(setQuery, 300);
 
-  const {data, isLoading, isSuccess} =  useQuery({
+  const {data, isLoading, isError, isSuccess} =  useQuery({
     queryKey: ["notes", search, currentPage, perPage],
     queryFn: () => fetchNotes(
       {search, page: currentPage, perPage}),
   });
-
-  const handleSearch = (newQuery: string) => {
-setQuery(newQuery);
-setCurrentPage(1);
-  }
  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => setIsModalOpen(true);
@@ -52,7 +46,8 @@ setCurrentPage(1);
       </Modal>
     )}
   </header>
-  
+  {isLoading && <Loader/>}
+  {isError && <ErrorMessage/>}
 </div>
 {data && isSuccess && data.notes.length > 0 && <NoteList notes={data.notes}/>}
      </>  
