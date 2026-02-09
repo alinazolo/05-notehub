@@ -2,7 +2,7 @@ import css from "./App.module.css"
 import { useState } from "react";
 import SearchBox from "../SearchBox/SearchBox";
 import {fetchNotes} from "../../services/noteService";
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import NoteForm from "../NoteForm/NoteForm";
 import Pagination from "../Pagination/Pagination";
 import { useDebouncedCallback } from "use-debounce";
@@ -31,6 +31,7 @@ setCurrentPage(1);
     queryKey: ["notes", query, currentPage, perPage],
     queryFn: () => fetchNotes(
       {search: query, page: currentPage, perPage}),
+      placeholderData: keepPreviousData,
   });
  
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -46,7 +46,7 @@ export const createNote = async (noteData: Pick<Note, "title" | "content" | "tag
   return data;
 };
 
-export const deleteNote = async (id: number) => {
+export const deleteNote = async (id: string) => {
 const { data } = await axios.delete<Note>(`/notes/${id}`,
      {
       headers: {
